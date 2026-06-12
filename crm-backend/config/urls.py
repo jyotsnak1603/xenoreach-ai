@@ -23,5 +23,6 @@ urlpatterns = [
     path("api/", include("apps.segments.urls")),
     path("api/", include("apps.campaigns.urls")),
     path("api/", include("apps.communications.urls")),
-
+    path("api/", include("apps.analytics.urls")),
+    path("api/", include("apps.ai_engine.urls")),
 ]

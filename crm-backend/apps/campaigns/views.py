@@ -8,6 +8,7 @@ from .serializers import CampaignSerializer
 from apps.communications.models import Communication
 from apps.segments.services import get_customers_for_segment
 
+from .services import dispatch_to_channel_service
 
 class CampaignListCreateView(generics.ListCreateAPIView):
     queryset = Campaign.objects.select_related("segment").all().order_by("-created_at")
@@ -53,6 +54,8 @@ def launch_campaign(request, pk):
             current_status="created",
         )
 
+        dispatch_to_channel_service(communication)
+        
         communications.append(communication)
 
     campaign.target_audience_count = len(communications)
