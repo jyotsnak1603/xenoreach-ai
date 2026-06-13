@@ -40,11 +40,11 @@
 
 /* ── Light Mode overrides MUST be outside @layer base to beat Tailwind @theme variables ── */
 :root.light {
-  --color-background: #F8FAFC;
-  --color-foreground: #0F172A;
+  --color-background: #F4F4F5; /* zinc-100, softer than slate-50 */
+  --color-foreground: #27272A; /* zinc-800, less harsh than deep slate */
 
-  --color-card: #FFFFFF;
-  --color-card-foreground: #0F172A;
+  --color-card: #FAFAFA; /* zinc-50, off-white instead of pure white */
+  --color-card-foreground: #27272A;
 
   --color-primary: #6366F1;
   --color-primary-foreground: #ffffff;
@@ -56,17 +56,17 @@
   --color-warning: #D97706;
   --color-danger: #DC2626;
 
-  --color-muted: #64748B;
-  --color-muted-foreground: #64748B;
+  --color-muted: #71717A; /* zinc-500 */
+  --color-muted-foreground: #71717A;
 
-  --color-border: #E2E8F0;
-  --color-input: #E2E8F0;
+  --color-border: #E4E4E7; /* zinc-200 */
+  --color-input: #E4E4E7;
   --color-ring: #6366F1;
 }
 
 /* Light mode body tint */
 :root.light body {
-  background-color: #F1F5F9;
+  background-color: #E4E4E7; /* zinc-200 for outer body to make cards pop softly */
 }
 
 /* Light mode: fix hover-on-white backgrounds */
