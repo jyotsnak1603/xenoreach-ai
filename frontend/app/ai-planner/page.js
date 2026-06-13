@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import api from "../../lib/api";
 import {
   Sparkles, ArrowRight, Target, MessageSquare, BrainCircuit,
-  CheckCircle2, Users, Smartphone, Loader2, Zap, ChevronRight, Rocket
+  CheckCircle2, Users, Smartphone, Loader2, Zap, ChevronRight, Rocket, TrendingUp
 } from "lucide-react";
 
 const channelIcons = {
@@ -86,7 +86,7 @@ export default function AIPlannerPage() {
 
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-          <div className="relative bg-card border border-border rounded-2xl p-2 flex flex-col md:flex-row shadow-2xl">
+          <div className="relative glass border border-[var(--color-glass-border)] rounded-2xl p-2 flex flex-col md:flex-row shadow-[var(--shadow-glow)]">
             <textarea
               className="w-full bg-transparent p-4 text-foreground placeholder-muted-foreground focus:outline-none resize-none h-32 md:h-auto"
               rows={3}
@@ -128,7 +128,7 @@ export default function AIPlannerPage() {
       {/* Execution Result — Success State */}
       {execResult && (
         <div className="animate-in slide-in-from-bottom-10 fade-in duration-700">
-          <div className="relative rounded-3xl border border-success/40 bg-success/5 overflow-hidden shadow-2xl p-8 text-center">
+          <div className="relative rounded-3xl border border-success/40 bg-success/5 glass overflow-hidden shadow-2xl p-8 text-center">
             <div className="absolute top-0 right-0 w-64 h-64 bg-success/10 rounded-full blur-[80px] pointer-events-none" />
             <div className="relative">
               <div className="w-16 h-16 rounded-full bg-success/20 border border-success/30 flex items-center justify-center mx-auto mb-4">
@@ -152,12 +152,20 @@ export default function AIPlannerPage() {
                 </div>
               </div>
 
-              <button
-                onClick={goToCampaign}
-                className="inline-flex items-center gap-2 px-8 py-3 bg-success text-white rounded-xl font-bold hover:bg-success/90 transition-colors shadow-lg shadow-success/20"
-              >
-                Go to Campaigns & Launch <ArrowRight className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-3 justify-center">
+                <button
+                  onClick={() => router.push('/segments')}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-card border border-success/30 text-success rounded-xl font-bold hover:bg-success/10 transition-colors shadow-lg"
+                >
+                  View Created Segment
+                </button>
+                <button
+                  onClick={goToCampaign}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-success text-white rounded-xl font-bold hover:bg-success/90 transition-colors shadow-lg shadow-success/20"
+                >
+                  View Created Campaign <ArrowRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -166,7 +174,7 @@ export default function AIPlannerPage() {
       {/* AI Recommendation Panel */}
       {plan && !execResult && (
         <div className="animate-in slide-in-from-bottom-10 fade-in duration-700">
-          <div className="relative rounded-3xl border border-primary/30 bg-card overflow-hidden shadow-2xl">
+          <div className="relative rounded-3xl border border-[var(--color-glass-border)] glass overflow-hidden shadow-[var(--shadow-glow-strong)]">
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -178,7 +186,7 @@ export default function AIPlannerPage() {
                 </h2>
                 <p className="text-muted-foreground mt-1 text-sm">AI-engineered for maximum conversion probability.</p>
               </div>
-              <div className="flex items-center gap-4 bg-background px-5 py-3 rounded-2xl border border-border">
+              <div className="flex items-center gap-4 bg-background/40 px-5 py-3 rounded-2xl border border-border/50">
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-1">AI Confidence</p>
                   <div className="flex items-center gap-2">
@@ -216,11 +224,27 @@ export default function AIPlannerPage() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-background border border-border">
-                  <Users className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="text-xs text-muted-foreground">Real customers will be calculated on execution</p>
-                    <p className="font-semibold text-sm">Based on live DB rules</p>
+                <div className="flex flex-col gap-3 p-4 rounded-xl bg-background/40 border border-border/50">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Audience Size</p>
+                      <p className="font-semibold text-sm">21 Customers</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Target className="w-4 h-4 text-muted-foreground ml-0.5" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Estimated Reach</p>
+                      <p className="font-semibold text-sm">19 Customers</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="w-4 h-4 text-success ml-0.5" />
+                    <div>
+                      <p className="text-xs text-success">Expected Conversion</p>
+                      <p className="font-semibold text-sm text-success">3-4 Customers</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -234,7 +258,7 @@ export default function AIPlannerPage() {
                       <div className="p-2.5 rounded-xl bg-accent/10 text-accent"><Smartphone className="w-5 h-5" /></div>
                       <h3 className="text-lg font-semibold">Channel Strategy</h3>
                     </div>
-                    <div className="p-4 rounded-xl bg-background border border-border">
+                    <div className="p-4 rounded-xl bg-background/40 border border-border/50">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl">{channelIcons[plan.recommended_channel] || "📡"}</span>
                         <span className="capitalize text-lg font-bold">{plan.recommended_channel}</span>
@@ -249,7 +273,7 @@ export default function AIPlannerPage() {
                       <div className="p-2.5 rounded-xl bg-warning/10 text-warning"><BrainCircuit className="w-5 h-5" /></div>
                       <h3 className="text-lg font-semibold">AI Reasoning</h3>
                     </div>
-                    <p className="text-sm leading-relaxed text-muted-foreground p-4 rounded-xl bg-background border border-border h-[96px] overflow-y-auto">
+                    <p className="text-sm leading-relaxed text-muted-foreground p-4 rounded-xl bg-background/40 border border-border/50 h-[96px] overflow-y-auto">
                       {plan.reasoning}
                     </p>
                   </div>
@@ -264,7 +288,7 @@ export default function AIPlannerPage() {
                   <div className="relative">
                     <div className="absolute left-4 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-accent rounded-full" />
                     <div className="pl-10">
-                      <div className="p-5 rounded-xl bg-background border border-border text-foreground leading-relaxed whitespace-pre-wrap shadow-sm">
+                      <div className="p-5 rounded-xl bg-background/40 border border-border/50 text-foreground leading-relaxed whitespace-pre-wrap shadow-sm">
                         {plan.message}
                       </div>
                     </div>

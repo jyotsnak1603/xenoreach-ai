@@ -164,7 +164,7 @@ You must rigidly adhere to this JSON Schema for your output:
         output = json.loads(ai_text)
 
         if "message" in output:
-            output["message"] = output["message"].replace("{name}", "{{name}}")
+            output["message"] = output["message"].replace("{{{{name}}}}", "{name}").replace("{{{name}}}", "{name}").replace("{{name}}", "{name}").replace("{name}", "{{name}}")
     except Exception as e:
         print(f"AI Generation Failed: {e}")
         output = {

@@ -104,7 +104,7 @@ export default function CampaignsPage() {
         <div className="xl:col-span-3 space-y-6">
 
           {/* Campaign Details */}
-          <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="glass border border-[var(--color-glass-border)] rounded-2xl p-6 shadow-[var(--shadow-glow)]">
             <h2 className="text-lg font-semibold mb-5 flex items-center gap-2">
               <span className="bg-primary/20 text-primary w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">1</span>
               Campaign Details
@@ -122,7 +122,7 @@ export default function CampaignsPage() {
           </div>
 
           {/* Segment Selector */}
-          <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="glass border border-[var(--color-glass-border)] rounded-2xl p-6 shadow-[var(--shadow-glow)]">
             <h2 className="text-lg font-semibold mb-5 flex items-center gap-2">
               <span className="bg-primary/20 text-primary w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">2</span>
               Target Segment
@@ -176,23 +176,23 @@ export default function CampaignsPage() {
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Rules</p>
                     <div className="flex flex-wrap gap-1.5">
                       {formatRules(selectedSegment.rules_json).map((r, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-background border border-border text-xs font-mono">
+                        <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-background border border-border text-xs font-mono shadow-sm">
                           <CheckCircle2 className="w-3 h-3 text-primary" /> {r}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
-                <div className="flex gap-2 pt-1">
-                  <Link href={`/segments`} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors flex items-center gap-1"><Users className="w-3 h-3" /> View Customers</Link>
-                  <Link href={`/segments`} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors">Edit Segment</Link>
+                <div className="flex gap-2 pt-3 border-t border-border/50">
+                  <button type="button" onClick={() => router.push(`/customers?segment=${selectedSegment.id}`)} className="flex-1 text-xs px-3 py-2 rounded-lg bg-primary text-primary-foreground font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5 shadow-md shadow-primary/20"><Eye className="w-3.5 h-3.5" /> Preview Audience</button>
+                  <Link href={`/segments`} className="flex-1 text-xs px-3 py-2 rounded-lg border border-border bg-background hover:bg-foreground/5 transition-colors font-medium flex items-center justify-center text-foreground">Edit Rules</Link>
                 </div>
               </div>
             )}
           </div>
 
           {/* Channel + Message */}
-          <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="glass border border-[var(--color-glass-border)] rounded-2xl p-6 shadow-[var(--shadow-glow)]">
             <h2 className="text-lg font-semibold mb-5 flex items-center gap-2">
               <span className="bg-primary/20 text-primary w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">3</span>
               Channel & Message
@@ -254,7 +254,7 @@ export default function CampaignsPage() {
         {/* ═══ RIGHT: Preview + AI (2 cols) ═══ */}
         <div className="xl:col-span-2 space-y-6">
           {/* Live Preview */}
-          <div className="bg-card border border-border rounded-2xl p-6 sticky top-8">
+          <div className="glass border border-[var(--color-glass-border)] rounded-2xl p-6 sticky top-8 shadow-[var(--shadow-glow)]">
             <h2 className="text-lg font-semibold mb-5 flex items-center gap-2">
               <span className="bg-primary/20 text-primary w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold">⚡</span>
               Live Preview
@@ -383,9 +383,12 @@ export default function CampaignsPage() {
                               {launching === campaign.id ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Send className="w-3.5 h-3.5" />} Launch
                             </button>
                           )}
-                          <Link href={`/campaigns/${campaign.id}/analytics`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border hover:bg-white/10 rounded-lg transition-colors font-medium text-xs">
-                            <BarChart2 className="w-3.5 h-3.5" /> Analytics
+                          <Link href={`/campaigns/${campaign.id}/analytics`} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border hover:bg-foreground/5 rounded-lg transition-colors font-medium text-xs text-foreground">
+                            <BarChart2 className="w-3.5 h-3.5 text-primary" /> Analytics
                           </Link>
+                          <button type="button" className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border hover:bg-foreground/5 rounded-lg transition-colors font-medium text-xs text-foreground">
+                            Duplicate
+                          </button>
                         </div>
                       </td>
                     </tr>

@@ -55,9 +55,9 @@ export default function GlobalAnalyticsPage() {
           { label: "Total Clicks", value: "12,403", icon: MousePointerClick, color: "text-accent", bg: "bg-accent/10" },
           { label: "Total Opens", value: "45,291", icon: Users, color: "text-warning", bg: "bg-warning/10" },
         ].map((stat, i) => (
-          <div key={i} className="p-5 rounded-2xl bg-card border border-border hover:border-primary/40 transition-colors">
+          <div key={i} className="p-5 rounded-2xl glass border border-[var(--color-glass-border)] hover:border-primary/40 transition-all hover:shadow-[var(--shadow-glow)] hover:-translate-y-1">
             <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 rounded-lg ${stat.bg} ${stat.color}`}>
+              <div className={`p-2 rounded-lg ${stat.bg} ${stat.color} shadow-sm`}>
                 <stat.icon className="w-4 h-4" />
               </div>
               <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
@@ -67,8 +67,8 @@ export default function GlobalAnalyticsPage() {
         ))}
       </div>
 
-      <div className="p-6 rounded-2xl bg-card border border-border">
-        <h3 className="text-lg font-semibold mb-6">Weekly Engagement</h3>
+      <div className="p-6 rounded-2xl glass border border-[var(--color-glass-border)] shadow-[var(--shadow-glow)]">
+        <h3 className="text-lg font-bold mb-6">Weekly Engagement</h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -95,11 +95,11 @@ export default function GlobalAnalyticsPage() {
         <h3 className="text-xl font-bold mb-4">Campaign Reports</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {campaigns.map(camp => (
-            <Link key={camp.id} href={`/campaigns/${camp.id}/analytics`} className="group p-5 rounded-2xl bg-card border border-border hover:border-primary/50 hover:bg-white/5 transition-all flex flex-col">
-              <h4 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">{camp.name}</h4>
+            <Link key={camp.id} href={`/campaigns/${camp.id}/analytics`} className="group p-5 rounded-2xl glass border border-[var(--color-glass-border)] hover:border-primary/50 transition-all flex flex-col hover:shadow-[var(--shadow-glow)]">
+              <h4 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{camp.name}</h4>
               <p className="text-sm text-muted-foreground mb-4 line-clamp-1">{camp.goal}</p>
-              <div className="mt-auto flex items-center justify-between text-sm">
-                <span className="px-2.5 py-1 rounded-md bg-background border border-border capitalize">{camp.channel}</span>
+              <div className="mt-auto flex items-center justify-between text-sm pt-4 border-t border-border/50">
+                <span className="px-2.5 py-1 rounded-md bg-background border border-border capitalize font-medium">{camp.channel}</span>
                 <span className="flex items-center gap-1 text-primary group-hover:translate-x-1 transition-transform">
                   View <ChevronRight className="w-4 h-4" />
                 </span>
@@ -107,7 +107,7 @@ export default function GlobalAnalyticsPage() {
             </Link>
           ))}
           {campaigns.length === 0 && (
-            <div className="col-span-full p-8 text-center text-muted-foreground bg-card border border-border rounded-2xl">
+            <div className="col-span-full p-8 text-center text-muted-foreground glass border border-[var(--color-glass-border)] rounded-2xl">
               No campaigns available to analyze.
             </div>
           )}

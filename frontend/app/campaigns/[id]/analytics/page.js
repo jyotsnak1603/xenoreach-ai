@@ -73,8 +73,8 @@ export default function CampaignAnalyticsPage() {
           </p>
         </div>
         
-        <button className="flex items-center gap-2 px-4 py-2 bg-card border border-border text-foreground rounded-lg hover:bg-white/5 transition-colors font-medium text-sm">
-          <Download className="w-4 h-4" /> Export Report
+        <button className="flex items-center gap-2 px-4 py-2 glass border border-[var(--color-glass-border)] text-foreground rounded-lg hover:border-primary/40 transition-colors font-medium text-sm shadow-sm hover:shadow-[var(--shadow-glow)]">
+          <Download className="w-4 h-4 text-primary" /> Export Report
         </button>
       </div>
 
@@ -86,9 +86,9 @@ export default function CampaignAnalyticsPage() {
           { label: "Click Rate", value: `${analytics.click_rate}%`, icon: MousePointerClick, color: "text-accent", bg: "bg-accent/10" },
           { label: "Open Rate", value: `${analytics.open_rate}%`, icon: Activity, color: "text-warning", bg: "bg-warning/10" },
         ].map((stat, i) => (
-          <div key={i} className="p-5 rounded-2xl bg-card border border-border">
+          <div key={i} className="p-5 rounded-2xl glass border border-[var(--color-glass-border)] hover:border-primary/40 transition-all hover:shadow-[var(--shadow-glow)] hover:-translate-y-1">
             <div className="flex items-center gap-3 mb-3">
-              <div className={`p-2 rounded-lg ${stat.bg} ${stat.color}`}>
+              <div className={`p-2 rounded-lg ${stat.bg} ${stat.color} shadow-sm`}>
                 <stat.icon className="w-4 h-4" />
               </div>
               <span className="text-sm font-medium text-muted-foreground">{stat.label}</span>
@@ -103,8 +103,8 @@ export default function CampaignAnalyticsPage() {
         <div className="lg:col-span-2 space-y-8">
           
           {/* Engagement Trend */}
-          <div className="p-6 rounded-2xl bg-card border border-border">
-            <h3 className="text-lg font-semibold mb-6">Engagement Trend</h3>
+          <div className="p-6 rounded-2xl glass border border-[var(--color-glass-border)] shadow-[var(--shadow-glow)]">
+            <h3 className="text-lg font-bold mb-6">Engagement Trend</h3>
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -133,8 +133,8 @@ export default function CampaignAnalyticsPage() {
           </div>
 
           {/* Funnel */}
-          <div className="p-6 rounded-2xl bg-card border border-border">
-            <h3 className="text-lg font-semibold mb-6">Campaign Funnel</h3>
+          <div className="p-6 rounded-2xl glass border border-[var(--color-glass-border)] shadow-[var(--shadow-glow)]">
+            <h3 className="text-lg font-bold mb-6">Campaign Funnel</h3>
             <div className="h-[250px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={funnelData} layout="vertical" margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
@@ -161,7 +161,7 @@ export default function CampaignAnalyticsPage() {
         <div className="space-y-8">
           
           {/* AI Insights Card */}
-          <div className="relative rounded-2xl border border-primary/30 overflow-hidden bg-card shadow-[0_0_30px_rgba(99,102,241,0.05)]">
+          <div className="relative rounded-2xl border border-[var(--color-glass-border)] glass overflow-hidden shadow-[var(--shadow-glow-strong)]">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
             
             <div className="relative p-6">
@@ -255,8 +255,8 @@ export default function CampaignAnalyticsPage() {
           </div>
 
           {/* Raw Delivery Stats */}
-          <div className="p-6 rounded-2xl bg-card border border-border">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-4 uppercase tracking-wider">Delivery Overview</h3>
+          <div className="p-6 rounded-2xl glass border border-[var(--color-glass-border)]">
+            <h3 className="text-sm font-bold text-muted-foreground mb-4 uppercase tracking-wider">Delivery Overview</h3>
             <div className="space-y-4">
               {[
                 { label: "Total Audience", value: analytics.audience_count },

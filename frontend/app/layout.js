@@ -37,13 +37,16 @@ function SidebarNav() {
           <Link
             key={item.name}
             href={item.href}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all group ${
+            className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group overflow-hidden ${
               isActive
-                ? "bg-primary/10 text-foreground border border-primary/20"
-                : "text-muted-foreground hover:text-foreground hover:bg-white/5 border border-transparent"
+                ? "text-foreground bg-primary/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]"
+                : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
             }`}
           >
-            <item.icon className={`w-5 h-5 transition-colors ${isActive ? "text-primary" : "group-hover:text-primary"}`} />
+            {isActive && (
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+            )}
+            <item.icon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? "text-primary drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" : "group-hover:text-primary"}`} />
             <span className="font-medium">{item.name}</span>
           </Link>
         );
@@ -58,9 +61,11 @@ export default function RootLayout({ children }) {
   const [isDark, setIsDark] = useState(true);
   const notifRef = useRef(null);
   const profRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
 
   // Load saved theme from localStorage on mount
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem("xeno-theme");
     const prefersDark = saved ? saved === "dark" : true;
     setIsDark(prefersDark);
@@ -89,7 +94,7 @@ export default function RootLayout({ children }) {
       <body className="flex h-screen bg-background text-foreground overflow-hidden">
 
         {/* ── Sidebar ── */}
-        <aside className="w-64 flex-shrink-0 border-r border-border bg-card/50 backdrop-blur-xl flex flex-col">
+        <aside className="w-64 flex-shrink-0 border-r border-border/50 glass flex flex-col z-20">
           {/* Logo */}
           <div className="h-16 flex items-center px-6 border-b border-border">
             <Link href="/" className="flex items-center gap-2 group">
@@ -122,7 +127,7 @@ export default function RootLayout({ children }) {
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
 
           {/* Top Navbar */}
-          <header className="h-16 flex-shrink-0 border-b border-border bg-background/80 backdrop-blur-sm flex items-center justify-between px-8 z-10">
+          <header className="h-16 flex-shrink-0 border-b border-border/50 glass flex items-center justify-between px-8 z-10">
             {/* Search */}
             <div className="flex-1 max-w-md relative group">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
@@ -141,7 +146,7 @@ export default function RootLayout({ children }) {
                 title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                 className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white/5 transition-all text-muted-foreground hover:text-foreground overflow-hidden"
               >
-                {isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5 text-warning" />}
+                {!mounted ? <Moon className="w-5 h-5" /> : (isDark ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5 text-warning" />)}
               </button>
 
               {/* Notifications */}

@@ -24,9 +24,16 @@
   --color-input: #1e293b;
   --color-ring: #6366F1;
 
+  --color-glass: rgba(19, 27, 46, 0.6);
+  --color-glass-border: rgba(255, 255, 255, 0.05);
+
+  --radius-xl: 1rem;
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
+
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
+  --shadow-glow-strong: 0 0 30px rgba(99, 102, 241, 0.3);
 }
 
 @layer base {
@@ -34,7 +41,21 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-[var(--color-glass)] backdrop-blur-xl border border-[var(--color-glass-border)];
+  }
+  
+  .skeleton {
+    @apply animate-pulse bg-muted/20 rounded-md;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
@@ -62,6 +83,9 @@
   --color-border: #E4E4E7; /* zinc-200 */
   --color-input: #E4E4E7;
   --color-ring: #6366F1;
+
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-glass-border: rgba(0, 0, 0, 0.05);
 }
 
 /* Light mode body tint */

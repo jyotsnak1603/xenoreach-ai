@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import api from "../../lib/api";
 import {
   Search, MapPin, MessageCircle, Mail, Phone, Radio,
-  MoreHorizontal, ShoppingCart, DollarSign, Users, ChevronDown,
-  Eye, Package, Megaphone, Trash2, X, Sparkles, TrendingUp
+  MoreHorizontal, ShoppingCart, DollarSign, Users,
+  Eye, Package, Megaphone, Trash2, X, TrendingUp, Filter, ArrowUpDown
 } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────
@@ -18,8 +18,8 @@ const channelConfig = {
 };
 
 const typeBadge = {
-  VIP:      "bg-primary/15 text-primary border-primary/30 shadow-primary/5 shadow-sm",
-  Regular:  "bg-success/15 text-success border-success/30 shadow-success/5 shadow-sm",
+  VIP:      "bg-primary/15 text-primary border-primary/30 shadow-primary/5",
+  Regular:  "bg-success/15 text-success border-success/30 shadow-success/5",
   Inactive: "bg-muted/10 text-muted-foreground border-border",
 };
 
@@ -55,14 +55,14 @@ function ActionMenu({ onClose, onAction }) {
   }, [onClose]);
 
   const items = [
-    { id: "details", icon: Eye,       label: "View Details" },
-    { id: "orders",  icon: Package,   label: "View Orders" },
+    { id: "details", icon: Eye,       label: "View Profile" },
+    { id: "orders",  icon: Package,   label: "Orders" },
     { id: "history", icon: Megaphone, label: "Campaign History" },
     { id: "delete",  icon: Trash2,    label: "Delete Customer", danger: true },
   ];
 
   return (
-    <div ref={ref} className="absolute right-0 top-8 z-30 w-52 rounded-xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl shadow-black/30 py-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+    <div ref={ref} className="absolute right-0 top-8 z-30 w-52 rounded-xl border border-[var(--color-glass-border)] bg-[var(--color-glass)] backdrop-blur-xl shadow-2xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
       {items.map((item, i) => (
         <button
           key={i}
@@ -70,7 +70,7 @@ function ActionMenu({ onClose, onAction }) {
           className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors ${
             item.danger
               ? "text-danger hover:bg-danger/10"
-              : "text-foreground/80 hover:text-foreground hover:bg-white/5"
+              : "text-foreground/80 hover:text-foreground hover:bg-foreground/5"
           }`}
         >
           <item.icon className="w-4 h-4 shrink-0" />
@@ -107,8 +107,8 @@ export default function CustomersPage() {
   const [cityFilter, setCityFilter] = useState("All");
   const [channelFilter, setChannelFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
+  const [sortBy, setSortBy] = useState("newest"); // newest, spend, orders
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [activeModal, setActiveModal] = useState({ type: null, customer: null });
 
   useEffect(() => {
     async function load() {
@@ -129,7 +129,7 @@ export default function CustomersPage() {
   }, []);
 
   const handleAction = async (actionId, customer) => {
-    if (actionId === "details") {
+    if (actionId === "details" || actionId === "orders" || actionId === "history") {
       router.push(`/customers/${customer.id}`);
     } else if (actionId === "delete") {
       try {
@@ -138,8 +138,6 @@ export default function CustomersPage() {
       } catch (err) {
         console.error("Failed to delete customer", err);
       }
-    } else {
-      setActiveModal({ type: actionId, customer });
     }
   };
 
@@ -154,6 +152,22 @@ export default function CustomersPage() {
     return map;
   }, [orders]);
 
+  // Aggregate top-level stats
+  const headerStats = useMemo(() => {
+    let totalSpend = 0;
+    let vipCount = 0;
+    customers.forEach(c => {
+      const stats = customerStats[c.id] || { count: 0, spend: 0 };
+      totalSpend += stats.spend;
+      if (classify(stats.spend, stats.count) === "VIP") vipCount++;
+    });
+    return {
+      total: customers.length,
+      spend: totalSpend,
+      vip: vipCount
+    };
+  }, [customers, customerStats]);
+
   // Derive unique cities for filter
   const cities = useMemo(() => {
     const set = new Set(customers.map((c) => c.city));
@@ -163,9 +177,9 @@ export default function CustomersPage() {
   const channels = ["All", "whatsapp", "email", "sms", "rcs"];
   const types = ["All", "VIP", "Regular", "Inactive"];
 
-  // Filter logic
+  // Filter and Sort logic
   const filtered = useMemo(() => {
-    return customers.filter((c) => {
+    let result = customers.filter((c) => {
       const stats = customerStats[c.id] || { count: 0, spend: 0 };
       const cType = classify(stats.spend, stats.count);
 
@@ -179,7 +193,18 @@ export default function CustomersPage() {
       if (typeFilter !== "All" && cType !== typeFilter) return false;
       return true;
     });
-  }, [customers, customerStats, searchTerm, cityFilter, channelFilter, typeFilter]);
+
+    result.sort((a, b) => {
+      const statsA = customerStats[a.id] || { count: 0, spend: 0 };
+      const statsB = customerStats[b.id] || { count: 0, spend: 0 };
+      
+      if (sortBy === "spend") return statsB.spend - statsA.spend;
+      if (sortBy === "orders") return statsB.count - statsA.count;
+      return b.id - a.id; // newest
+    });
+
+    return result;
+  }, [customers, customerStats, searchTerm, cityFilter, channelFilter, typeFilter, sortBy]);
 
   const activeFilterCount = [cityFilter, channelFilter, typeFilter].filter((f) => f !== "All").length;
 
@@ -187,11 +212,16 @@ export default function CustomersPage() {
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="h-8 w-48 bg-card rounded-lg animate-pulse" />
-        <div className="h-5 w-72 bg-card rounded animate-pulse" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+        <div className="h-8 w-48 skeleton" />
+        <div className="h-5 w-72 skeleton" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+           <div className="h-24 skeleton" />
+           <div className="h-24 skeleton" />
+           <div className="h-24 skeleton" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mt-8">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-64 rounded-2xl bg-card border border-border animate-pulse" />
+            <div key={i} className="h-48 skeleton" />
           ))}
         </div>
       </div>
@@ -199,69 +229,105 @@ export default function CustomersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* ── Header ── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
-          <p className="text-muted-foreground mt-1">
-            {customers.length.toLocaleString()} contacts · Manage and segment your audience.
-          </p>
+    <div className="space-y-6 pb-20 animate-in fade-in duration-500">
+      {/* ── Header & Top Stats ── */}
+      <div className="flex flex-col gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Customers</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage and analyze your shopper database.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative group">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <input
+                type="text"
+                placeholder="Search customers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-72 glass rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="relative group">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <input
-              type="text"
-              placeholder="Search by name, city or email…"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full md:w-72 bg-card border border-border rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all placeholder:text-muted-foreground"
-            />
+        {/* Header Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="glass p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground font-medium">Total Customers</p>
+              <h2 className="text-2xl font-bold mt-1">{headerStats.total.toLocaleString()}</h2>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+          </div>
+          <div className="glass p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground font-medium">Total Lifetime Spend</p>
+              <h2 className="text-2xl font-bold mt-1 text-success">₹{headerStats.spend.toLocaleString()}</h2>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-success" />
+            </div>
+          </div>
+          <div className="glass p-5 rounded-2xl flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground font-medium">VIP Audience</p>
+              <h2 className="text-2xl font-bold mt-1">{headerStats.vip.toLocaleString()}</h2>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-accent" />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ── Filters ── */}
-      <div className="space-y-3">
-        {/* City */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1 w-16 shrink-0">City</span>
-          {cities.map((c) => (
-            <FilterPill key={c} label={c} active={cityFilter === c} onClick={() => setCityFilter(c)} />
-          ))}
-        </div>
-        {/* Channel */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1 w-16 shrink-0">Channel</span>
-          {channels.map((ch) => (
-            <FilterPill key={ch} label={ch === "All" ? "All" : channelConfig[ch]?.label || ch} active={channelFilter === ch} onClick={() => setChannelFilter(ch)} />
-          ))}
-        </div>
-        {/* Type */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1 w-16 shrink-0">Type</span>
-          {types.map((t) => (
-            <FilterPill key={t} label={t} active={typeFilter === t} onClick={() => setTypeFilter(t)} />
-          ))}
+      {/* ── Filters & Sorting ── */}
+      <div className="glass p-4 rounded-xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+        <div className="space-y-3 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <Filter className="w-4 h-4 text-muted-foreground mr-1" />
+            {cities.map((c) => (
+              <FilterPill key={c} label={c} active={cityFilter === c} onClick={() => setCityFilter(c)} />
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="w-5 mr-1" /> {/* Spacer */}
+            {channels.map((ch) => (
+              <FilterPill key={ch} label={ch === "All" ? "All Channels" : channelConfig[ch]?.label || ch} active={channelFilter === ch} onClick={() => setChannelFilter(ch)} />
+            ))}
+            <div className="w-px h-4 bg-border mx-2" />
+            {types.map((t) => (
+              <FilterPill key={t} label={t} active={typeFilter === t} onClick={() => setTypeFilter(t)} />
+            ))}
+            {activeFilterCount > 0 && (
+              <button onClick={() => { setCityFilter("All"); setChannelFilter("All"); setTypeFilter("All"); }} className="text-xs text-primary ml-2 hover:underline">
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
 
-        {activeFilterCount > 0 && (
-          <button
-            onClick={() => { setCityFilter("All"); setChannelFilter("All"); setTypeFilter("All"); }}
-            className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 transition-colors"
+        {/* Sort */}
+        <div className="flex items-center gap-2 border-l border-border/50 pl-4">
+          <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+          <select 
+            value={sortBy} 
+            onChange={(e) => setSortBy(e.target.value)}
+            className="bg-transparent text-sm font-medium focus:outline-none cursor-pointer"
           >
-            <X className="w-3 h-3" /> Clear {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""}
-          </button>
-        )}
+            <option value="newest" className="bg-card text-foreground">Sort by Newest</option>
+            <option value="spend" className="bg-card text-foreground">Highest Spend</option>
+            <option value="orders" className="bg-card text-foreground">Most Orders</option>
+          </select>
+        </div>
       </div>
 
-      {/* ── Results count ── */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          Showing <span className="text-foreground font-semibold">{filtered.length}</span> of {customers.length} customers
-        </p>
+      <div className="text-sm text-muted-foreground">
+        Showing <span className="text-foreground font-semibold">{filtered.length}</span> results
       </div>
 
       {/* ── Customer Grid ── */}
@@ -275,23 +341,21 @@ export default function CustomersPage() {
           return (
             <div
               key={customer.id}
-              className="group relative flex flex-col rounded-2xl border border-border bg-card cursor-pointer transition-all duration-300 ease-out hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(99,102,241,0.08)] hover:scale-[1.02] overflow-hidden"
+              onClick={() => router.push(`/customers/${customer.id}`)}
+              className="group relative flex flex-col rounded-2xl glass cursor-pointer transition-all duration-300 ease-out hover:border-primary/40 hover:shadow-[var(--shadow-glow)] hover:scale-[1.02] overflow-hidden"
             >
-              {/* Top glow line */}
               <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-              {/* Card body */}
               <div className="p-5 flex-1 flex flex-col">
-                {/* Avatar row */}
                 <div className="flex justify-between items-start mb-5">
                   <div className="flex items-center gap-3.5">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarGradient(customer.id)} flex items-center justify-center shadow-lg ring-2 ring-white/10`}>
                       <span className="font-bold text-sm text-white drop-shadow">{initials(customer.name)}</span>
                     </div>
                     <div>
-                      <h2 className="font-semibold text-foreground leading-tight">{customer.name}</h2>
+                      <h2 className="font-semibold text-foreground leading-tight group-hover:text-primary transition-colors">{customer.name}</h2>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
-                        <MapPin className="w-3 h-3" /> {customer.city} <span className="opacity-40">·</span> Age {customer.age}
+                        <MapPin className="w-3 h-3" /> {customer.city}
                       </div>
                     </div>
                   </div>
@@ -300,7 +364,7 @@ export default function CustomersPage() {
                   <div className="relative">
                     <button
                       onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === customer.id ? null : customer.id); }}
-                      className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                      className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
@@ -310,14 +374,14 @@ export default function CustomersPage() {
 
                 {/* Stats row */}
                 <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="bg-background/60 rounded-xl p-3.5 border border-border/60 group-hover:border-border transition-colors">
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mb-1 uppercase tracking-wider">
+                  <div className="bg-background/60 rounded-xl p-3 border border-border/60 group-hover:border-border transition-colors">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-wider">
                       <ShoppingCart className="w-3 h-3" /> Orders
                     </div>
                     <div className="text-lg font-bold">{stats.count}</div>
                   </div>
-                  <div className="bg-background/60 rounded-xl p-3.5 border border-border/60 group-hover:border-border transition-colors">
-                    <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mb-1 uppercase tracking-wider">
+                  <div className="bg-background/60 rounded-xl p-3 border border-border/60 group-hover:border-border transition-colors">
+                    <div className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground mb-1 uppercase tracking-wider">
                       <DollarSign className="w-3 h-3" /> Spend
                     </div>
                     <div className="text-lg font-bold">₹{stats.spend.toLocaleString()}</div>
@@ -330,7 +394,7 @@ export default function CustomersPage() {
                     <ChIcon className="w-3.5 h-3.5" />
                     <span>{ch.label}</span>
                   </div>
-                  <span className={`text-[11px] font-bold px-3 py-1 rounded-full border ${typeBadge[cType]}`}>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${typeBadge[cType]}`}>
                     {cType}
                   </span>
                 </div>
@@ -340,52 +404,21 @@ export default function CustomersPage() {
         })}
       </div>
 
-      {/* ── Empty State ── */}
       {filtered.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <div className="w-20 h-20 rounded-2xl bg-card border border-border flex items-center justify-center mb-5 shadow-lg">
+        <div className="glass flex flex-col items-center justify-center py-24 text-center rounded-2xl">
+          <div className="w-20 h-20 rounded-2xl bg-background border border-border flex items-center justify-center mb-5 shadow-lg">
             <Users className="w-10 h-10 text-muted-foreground/50" />
           </div>
-          <h3 className="text-xl font-semibold mb-1">No customers found</h3>
-          <p className="text-muted-foreground max-w-md">
-            We couldn't find any customers matching your current search and filter criteria.
+          <h3 className="text-xl font-bold mb-1">No customers found</h3>
+          <p className="text-muted-foreground max-w-md mb-6">
+            Adjust your filters or search term to find what you're looking for.
           </p>
           <button
             onClick={() => { setSearchTerm(""); setCityFilter("All"); setChannelFilter("All"); setTypeFilter("All"); }}
-            className="mt-6 text-sm text-primary hover:text-primary/80 font-medium transition-colors"
+            className="px-6 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-colors"
           >
-            Clear all filters
+            Clear Filters
           </button>
-        </div>
-      )}
-
-      {/* ── Modals ── */}
-      {activeModal.type && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-md shadow-2xl relative">
-            <button 
-              onClick={() => setActiveModal({ type: null, customer: null })}
-              className="absolute top-4 right-4 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-white/5"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-bold mb-4 capitalize">Customer {activeModal.type}</h2>
-            <div className="space-y-3">
-              <p><strong>Name:</strong> {activeModal.customer.name}</p>
-              <p><strong>City:</strong> {activeModal.customer.city}</p>
-              <p><strong>Email:</strong> {activeModal.customer.email}</p>
-              <p><strong>Phone:</strong> {activeModal.customer.phone}</p>
-              <p><strong>Channel:</strong> {activeModal.customer.preferred_channel}</p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-border flex justify-end">
-              <button 
-                onClick={() => setActiveModal({ type: null, customer: null })}
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90"
-              >
-                Close
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>
