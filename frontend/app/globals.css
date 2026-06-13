@@ -37,3 +37,48 @@
     @apply bg-background text-foreground antialiased;
   }
 }
+
+/* ── Light Mode overrides MUST be outside @layer base to beat Tailwind @theme variables ── */
+:root.light {
+  --color-background: #F8FAFC;
+  --color-foreground: #0F172A;
+
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+
+  --color-primary: #6366F1;
+  --color-primary-foreground: #ffffff;
+
+  --color-accent: #7C3AED;
+  --color-accent-foreground: #ffffff;
+
+  --color-success: #16A34A;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+
+  --color-muted: #64748B;
+  --color-muted-foreground: #64748B;
+
+  --color-border: #E2E8F0;
+  --color-input: #E2E8F0;
+  --color-ring: #6366F1;
+}
+
+/* Light mode body tint */
+:root.light body {
+  background-color: #F1F5F9;
+}
+
+/* Light mode: fix hover-on-white backgrounds */
+:root.light .hover\:bg-white\/5:hover {
+  background-color: rgb(0 0 0 / 0.04) !important;
+}
+:root.light .hover\:bg-white\/10:hover {
+  background-color: rgb(0 0 0 / 0.06) !important;
+}
+:root.light .bg-white\/5 {
+  background-color: rgb(0 0 0 / 0.04) !important;
+}
+:root.light .bg-white\/\[0\.03\] {
+  background-color: rgb(0 0 0 / 0.02) !important;
+}
