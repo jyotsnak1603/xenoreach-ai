@@ -109,6 +109,22 @@ def channel_callback(request):
 
     communication.save()
 
+    # Auto-transition campaign status based on communication states
+    campaign = communication.campaign
+    if campaign.status == "launching":
+        campaign.status = "active"
+        campaign.save(update_fields=["status"])
+    elif campaign.status == "active":
+        # Check if all communications are in a terminal state
+        total = campaign.communications.count()
+        terminal = campaign.communications.filter(
+            current_status__in=["delivered", "failed", "opened", "clicked", "converted"]
+        ).count()
+        if total > 0 and terminal >= total:
+            campaign.status = "completed"
+            campaign.dispatch_completed_at = now
+            campaign.save(update_fields=["status", "dispatch_completed_at"])
+
     return Response(
         {
             "message": "Callback processed successfully",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import api from "../../lib/api";
 import {
   Search, MapPin, MessageCircle, Mail, Phone, Radio,
@@ -98,6 +99,7 @@ function FilterPill({ label, active, onClick }) {
 
 // ─── Main Page ────────────────────────────────────────────
 export default function CustomersPage() {
+  const router = useRouter();
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,7 +129,9 @@ export default function CustomersPage() {
   }, []);
 
   const handleAction = async (actionId, customer) => {
-    if (actionId === "delete") {
+    if (actionId === "details") {
+      router.push(`/customers/${customer.id}`);
+    } else if (actionId === "delete") {
       try {
         await api.delete(`/customers/${customer.id}/`);
         setCustomers((prev) => prev.filter((c) => c.id !== customer.id));

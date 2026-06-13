@@ -17,10 +17,11 @@ const channelOptions = [
 ];
 
 const statusConfig = {
-  draft:     { color: "bg-muted/10 text-muted-foreground border-border", icon: Clock },
-  active:    { color: "bg-primary/10 text-primary border-primary/20",    icon: Play },
-  completed: { color: "bg-success/10 text-success border-success/20",    icon: CheckCircle2 },
-  failed:    { color: "bg-danger/10 text-danger border-danger/20",       icon: XCircle },
+  draft:     { label: "Draft",      color: "bg-muted/10 text-muted-foreground border-border",   icon: Clock,        pulse: false },
+  launching: { label: "Launching",  color: "bg-blue-500/10 text-blue-400 border-blue-500/20",   icon: Activity,     pulse: true  },
+  active:    { label: "Live",       color: "bg-primary/10 text-primary border-primary/20",       icon: Play,         pulse: true  },
+  completed: { label: "Completed",  color: "bg-success/10 text-success border-success/20",       icon: CheckCircle2, pulse: false },
+  failed:    { label: "Failed",     color: "bg-danger/10 text-danger border-danger/20",          icon: XCircle,      pulse: false },
 };
 
 function formatRules(rulesObj) {
@@ -47,7 +48,15 @@ export default function CampaignsPage() {
     setCampaigns(c.data);
     setSegments(s.data);
   };
-  useEffect(() => { loadData(); }, []);
+
+  useEffect(() => {
+    loadData();
+    // Poll every 5s to pick up live status changes from channel-service callbacks
+    const interval = setInterval(() => {
+      api.get("/campaigns/").then(r => setCampaigns(r.data)).catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const createCampaign = async (e) => {
     e.preventDefault();
@@ -351,8 +360,16 @@ export default function CampaignsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border capitalize ${sc.color}`}>
-                          <SIcon className="w-3.5 h-3.5" /> {campaign.status}
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border ${sc.color}`}>
+                          {sc.pulse ? (
+                            <span className="relative flex h-2 w-2">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-current" />
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-current" />
+                            </span>
+                          ) : (
+                            <SIcon className="w-3.5 h-3.5" />
+                          )}
+                          {sc.label || campaign.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 font-mono text-muted-foreground">{campaign.target_audience_count?.toLocaleString() || 0}</td>

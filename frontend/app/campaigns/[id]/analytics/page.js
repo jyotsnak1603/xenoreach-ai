@@ -190,12 +190,42 @@ export default function CampaignAnalyticsPage() {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-5">
+                <div className="space-y-4">
+                  {/* Structured Insight Cards */}
+                  {(insights.best_channel || insights.best_metric_value) && (
+                    <div className="grid grid-cols-1 gap-3">
+                      {insights.best_channel && (
+                        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+                          <p className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Best Channel</p>
+                          <p className="font-bold capitalize">{insights.best_channel}</p>
+                          {insights.best_channel_reason && (
+                            <p className="text-xs text-muted-foreground mt-1">{insights.best_channel_reason}</p>
+                          )}
+                        </div>
+                      )}
+                      {insights.best_metric && (
+                        <div className="p-3 rounded-xl bg-success/5 border border-success/20">
+                          <p className="text-[10px] font-bold text-success uppercase tracking-wider mb-1">Top Metric</p>
+                          <p className="font-bold capitalize">{insights.best_metric.replace(/_/g, " ")}</p>
+                          {insights.best_metric_value && (
+                            <p className="text-xl font-black text-success">{insights.best_metric_value}</p>
+                          )}
+                        </div>
+                      )}
+                      {insights.recommended_segment && (
+                        <div className="p-3 rounded-xl bg-accent/5 border border-accent/20">
+                          <p className="text-[10px] font-bold text-accent uppercase tracking-wider mb-1">Best Segment Next Time</p>
+                          <p className="font-bold text-sm">{insights.recommended_segment}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <div className="p-4 rounded-xl bg-background/50 border border-border text-sm leading-relaxed text-foreground">
                     <span className="font-semibold text-primary block mb-1">Summary</span>
                     {insights.summary}
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-3 rounded-xl bg-success/5 border border-success/10 text-xs">
                       <span className="font-semibold text-success block mb-1">What Worked</span>

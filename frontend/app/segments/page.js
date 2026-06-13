@@ -70,8 +70,8 @@ export default function SegmentsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {segments.map((segment) => {
-          // Mock data for UI
-          const audienceSize = Math.floor(Math.random() * 5000) + 100;
+          // Real counts from the backend serializer
+          const audienceSize = segment.audience_count || 0;
           const estimatedReach = Math.floor(audienceSize * 0.85);
 
           const ruleBadges = formatRules(segment.rules_json);

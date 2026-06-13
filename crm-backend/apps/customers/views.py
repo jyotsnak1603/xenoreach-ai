@@ -14,9 +14,58 @@ class CustomerListView(generics.ListAPIView):
     serializer_class = CustomerSerializer
 
 
-class CustomerDetailView(generics.RetrieveAPIView):
+class CustomerDetailView(generics.RetrieveDestroyAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+
+@api_view(["GET"])
+def customer_timeline(request, pk):
+    try:
+        customer = Customer.objects.get(pk=pk)
+    except Customer.DoesNotExist:
+        return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    from apps.communications.models import Communication
+
+    # Orders with attribution
+    orders = Order.objects.filter(customer=customer).order_by("-order_date").select_related("source_communication")
+    orders_data = []
+    for o in orders:
+        orders_data.append({
+            "id": o.id,
+            "product_category": o.product_category,
+            "amount": float(o.amount),
+            "order_date": o.order_date,
+            "from_campaign": o.source_communication is not None,
+            "campaign_name": o.source_communication.campaign.name if o.source_communication else None,
+        })
+
+    # Communications timeline
+    comms = Communication.objects.filter(customer=customer).order_by("-created_at").select_related("campaign")
+    comms_data = []
+    for c in comms:
+        comms_data.append({
+            "id": c.id,
+            "campaign_name": c.campaign.name,
+            "channel": c.channel,
+            "current_status": c.current_status,
+            "sent_at": c.sent_at,
+            "delivered_at": c.delivered_at,
+            "opened_at": c.opened_at,
+            "clicked_at": c.clicked_at,
+            "converted_at": c.converted_at,
+            "personalized_message": c.personalized_message[:120] + "..." if len(c.personalized_message) > 120 else c.personalized_message,
+        })
+
+    total_spent = sum(o["amount"] for o in orders_data)
+    return Response({
+        "customer": CustomerSerializer(customer).data,
+        "total_spent": total_spent,
+        "order_count": len(orders_data),
+        "orders": orders_data,
+        "communications": comms_data,
+    })
 
 
 class OrderListView(generics.ListAPIView):

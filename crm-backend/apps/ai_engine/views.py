@@ -39,7 +39,11 @@ class AIInsightsSchema(BaseModel):
     what_worked: str = Field(description="What specific aspects succeeded")
     what_did_not_work: str = Field(description="Where did the campaign underperform")
     recommended_next_action: str = Field(description="What should the marketer do next")
-    best_metric: str = Field(description="The standout metric name (e.g., delivery_rate, conversion_rate)")
+    best_metric: str = Field(description="The standout metric name (e.g., click_rate, conversion_rate, delivery_rate)")
+    best_metric_value: str = Field(description="The value of the best metric as a string, e.g. '18%' or '142 users'")
+    best_channel: str = Field(description="The channel that performed best (whatsapp, email, sms, or rcs). Use the campaign channel if only one channel was used.")
+    best_channel_reason: str = Field(description="One sentence explaining why this channel performed best")
+    recommended_segment: str = Field(description="The type of segment that would perform better next time, e.g. 'Inactive VIP Customers'")
     confidence_score: int = Field(description="Integer between 0 and 100")
 
 
@@ -237,3 +241,68 @@ You must rigidly adhere to this JSON Schema for your output:
     )
 
     return Response(output)
+
+
+@api_view(["POST"])
+def execute_plan(request):
+    """
+    Takes the full AI plan blueprint and executes it:
+    1. Creates a real Segment with the AI-generated rules
+    2. Counts actual matching customers from the DB
+    3. Creates a draft Campaign pointing to that segment
+    Returns campaign_id so the frontend can redirect to /campaigns
+    """
+    plan = request.data
+
+    required_fields = ["segment_name", "segment_description", "segment_rules", "message", "recommended_channel"]
+    for field in required_fields:
+        if field not in plan:
+            return Response({"error": f"Missing field: {field}"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Import here to avoid circular imports
+    from apps.segments.models import Segment
+    from apps.segments.services import get_customers_for_segment
+    from apps.campaigns.models import Campaign
+
+    # Step 1: Create or fetch the segment
+    segment, _ = Segment.objects.get_or_create(
+        name=plan["segment_name"],
+        defaults={
+            "description": plan["segment_description"],
+            "rules_json": plan["segment_rules"],
+            "created_by_ai": True,
+            "ai_explanation": plan.get("reasoning", ""),
+        },
+    )
+
+    # Step 2: Count actual matching customers
+    audience_count = get_customers_for_segment(segment).count()
+
+    # Step 3: Create draft campaign
+    campaign = Campaign.objects.create(
+        name=f"AI: {plan['segment_name']}",
+        goal=plan.get("reasoning", "AI-generated campaign"),
+        segment=segment,
+        channel=plan["recommended_channel"],
+        message_template=plan["message"],
+        status="draft",
+        target_audience_count=audience_count,
+        ai_reasoning=plan.get("reasoning", ""),
+    )
+
+    AIRecommendation.objects.create(
+        campaign=campaign,
+        recommendation_type="planner",
+        input_prompt=str(plan),
+        output_json=plan,
+    )
+
+    return Response({
+        "message": "Campaign created from AI plan",
+        "campaign_id": campaign.id,
+        "segment_id": segment.id,
+        "segment_name": segment.name,
+        "audience_count": audience_count,
+        "campaign_name": campaign.name,
+        "channel": campaign.channel,
+    }, status=status.HTTP_201_CREATED)

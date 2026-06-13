@@ -5,11 +5,13 @@ from .views import (
     OrderListView,
     seed_customers,
     seed_orders,
+    customer_timeline,
 )
 
 urlpatterns = [
     path("customers/", CustomerListView.as_view()),
     path("customers/<int:pk>/", CustomerDetailView.as_view()),
+    path("customers/<int:pk>/timeline/", customer_timeline),
     path("customers/seed/", seed_customers),
 
     path("orders/", OrderListView.as_view()),
