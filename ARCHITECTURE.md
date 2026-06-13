@@ -23,7 +23,7 @@ I treat AI as a deterministic software component, not just a text generator.
 
 ### Current Implementation
 - I utilize **Gemini 2.5 Flash** leveraging its native `response_schema` capabilities.
-- Instead of brittle regex parsing of markdown outputs, our Django backend enforces rigid `Pydantic` schemas for every AI call (e.g., `CampaignPlanSchema`, `MessageVariantsSchema`).
+- Instead of brittle regex parsing of markdown outputs, Django backend enforces rigid `Pydantic` schemas for every AI call (e.g., `CampaignPlanSchema`, `MessageVariantsSchema`).
 - This guarantees that the AI always returns highly predictable, valid JSON that the CRM can instantly process without complex fallback handling.
 
 ## 3. Data Ingestion & Attribution
@@ -31,6 +31,6 @@ I treat AI as a deterministic software component, not just a text generator.
 The holy grail of a marketing CRM is proving that a message caused a sale (Attribution).
 
 ### Current Implementation
-- Our Data Model explicitly tracks every message lifecycle via the `Communication` and `CommunicationEvent` models.
+- The Data Model explicitly tracks every message lifecycle via the `Communication` and `CommunicationEvent` models.
 - The `Order` model contains a nullable `source_communication` ForeignKey.
-- When the Channel Service simulates a "Converted" event, our CRM webhook automatically mints a new `Order` tied directly to that `Communication`. This creates a closed-loop attribution system, allowing the Analytics dashboard to definitively say: "Campaign X generated ₹Y in revenue."
+- When the Channel Service simulates a "Converted" event, CRM webhook automatically mints a new `Order` tied directly to that `Communication`. This creates a closed-loop attribution system, allowing the Analytics dashboard to definitively say: "Campaign X generated ₹Y in revenue."
