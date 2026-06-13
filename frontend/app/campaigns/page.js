@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "../../lib/api";
 import {
@@ -36,6 +37,7 @@ function formatRules(rulesObj) {
 }
 
 export default function CampaignsPage() {
+  const router = useRouter();
   const [campaigns, setCampaigns] = useState([]);
   const [segments, setSegments] = useState([]);
   const [launching, setLaunching] = useState(null);
@@ -146,8 +148,8 @@ export default function CampaignsPage() {
               </div>
 
               <div className="flex gap-2 pt-2 border-t border-border/50">
-                <button type="button" onClick={() => alert("Redirecting to Segment Builder...")} className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors flex items-center gap-1.5"><Plus className="w-3 h-3" /> Create Segment</button>
-                <button type="button" onClick={() => alert("Opening AI Generator...")} className="text-xs px-3 py-1.5 rounded-lg border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Generate with AI</button>
+                <button type="button" onClick={() => router.push("/segments")} className="text-xs px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors flex items-center gap-1.5"><Plus className="w-3 h-3" /> Create Segment</button>
+                <button type="button" onClick={() => router.push("/ai-planner")} className="text-xs px-3 py-1.5 rounded-lg border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20 transition-colors flex items-center gap-1.5"><Sparkles className="w-3 h-3" /> Generate with AI</button>
               </div>
             </div>
 
@@ -162,11 +164,11 @@ export default function CampaignsPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-background/50 rounded-lg p-3 border border-border/50">
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">Audience Size</p>
-                    <p className="font-bold">{(Math.floor(Math.random() * 4000) + 500).toLocaleString()}</p>
+                    <p className="font-bold">{(selectedSegment.audience_count || 0).toLocaleString()}</p>
                   </div>
                   <div className="bg-background/50 rounded-lg p-3 border border-border/50">
                     <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-0.5">Est. Reach</p>
-                    <p className="font-bold">{(Math.floor(Math.random() * 3000) + 400).toLocaleString()}</p>
+                    <p className="font-bold">{Math.floor((selectedSegment.audience_count || 0) * 0.85).toLocaleString()}</p>
                   </div>
                 </div>
                 {selectedSegment.rules_json && (
@@ -182,8 +184,8 @@ export default function CampaignsPage() {
                   </div>
                 )}
                 <div className="flex gap-2 pt-1">
-                  <button type="button" onClick={() => alert("Viewing Customers for Segment: " + selectedSegment.name)} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors flex items-center gap-1"><Users className="w-3 h-3" /> View Customers</button>
-                  <button type="button" onClick={() => alert("Editing Segment: " + selectedSegment.name)} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors">Edit Segment</button>
+                  <Link href={`/segments`} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors flex items-center gap-1"><Users className="w-3 h-3" /> View Customers</Link>
+                  <Link href={`/segments`} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-white/5 transition-colors">Edit Segment</Link>
                 </div>
               </div>
             )}
