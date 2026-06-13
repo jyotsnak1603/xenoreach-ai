@@ -169,7 +169,7 @@ export default function CampaignAnalyticsPage() {
                 <div className="p-2 rounded-lg bg-gradient-to-r from-primary to-accent shadow-lg">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
-                <h2 className="text-xl font-bold bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
                   AI Campaign Insights
                 </h2>
               </div>

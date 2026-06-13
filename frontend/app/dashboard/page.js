@@ -108,7 +108,7 @@ export default function DashboardPage() {
             <div className="p-2 rounded-lg bg-gradient-to-r from-primary to-accent shadow-[0_0_15px_rgba(99,102,241,0.5)]">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
               AI Growth Insights
             </h2>
           </div>
@@ -137,7 +137,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="mt-8 flex justify-end">
-            <Link href="/analytics" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-sm font-medium">
+            <Link href="/analytics" className="flex items-center gap-2 px-4 py-2 rounded-lg bg-foreground/5 hover:bg-foreground/10 border border-foreground/10 transition-colors text-sm font-medium">
               View Detailed Report <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
