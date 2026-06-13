@@ -46,6 +46,13 @@ class Order(models.Model):
     product_category = models.CharField(max_length=100)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     order_date = models.DateTimeField()
+    source_communication = models.ForeignKey(
+        'communications.Communication',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="attributed_orders"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

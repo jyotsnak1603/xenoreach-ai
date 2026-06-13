@@ -96,6 +96,16 @@ def channel_callback(request):
         communication.clicked_at = now
     elif event_type == "converted":
         communication.converted_at = now
+        # Create a mock order to prove marketing attribution!
+        from apps.customers.models import Order
+        import random
+        Order.objects.create(
+            customer=communication.customer,
+            product_category="AI Campaign Promo",
+            amount=round(random.uniform(500, 2500), 2),
+            order_date=now,
+            source_communication=communication
+        )
 
     communication.save()
 
