@@ -292,7 +292,7 @@ export default function CustomerDetailPage() {
                       </div>
                       <div>
                         <p className="font-bold">{order.product_category}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5 font-mono">{order.id.slice(0, 8)}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 font-mono">{String(order.id).slice(0, 8)}</p>
                       </div>
                     </div>
                     <span className="font-bold text-xl text-foreground">₹{Number(order.amount).toLocaleString("en-IN")}</span>
