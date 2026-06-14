@@ -7,7 +7,7 @@ import api from "../../lib/api";
 import {
   Send, Smartphone, Mail, MessageSquare, Radio, Play, BarChart2,
   CheckCircle2, Clock, XCircle, AlertCircle, Target, Users, Activity,
-  Sparkles, BrainCircuit, ChevronDown, Plus, Rocket, Save, Hash
+  Sparkles, BrainCircuit, ChevronDown, Plus, Rocket, Save, Hash, Eye
 } from "lucide-react";
 
 const channelOptions = [
