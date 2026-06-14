@@ -6,7 +6,6 @@ XenoReach AI is an AI-assisted marketing CRM built for the Xeno SDE Internship A
 
 It helps D2C and retail brands identify the right audience, generate campaign messages, choose communication channels, launch campaigns, and analyze communication performance through a realistic event-driven communication workflow.
 
----
 
 ## Live Demo
 
@@ -22,7 +21,6 @@ To be added before final submission
 **GitHub Repository:**
 https://github.com/jyotsnak1603/xenoreach-ai
 
----
 
 ## Problem Statement
 
@@ -36,7 +34,6 @@ D2C brands often have customer and order data but still struggle to answer key m
 
 XenoReach AI combines customer data, audience segmentation, AI recommendations, campaign execution, and analytics into a single workflow.
 
----
 
 ## Why XenoReach AI?
 
@@ -51,7 +48,6 @@ XenoReach AI focuses on helping marketers make better decisions by answering:
 
 The product uses AI to assist decision-making while keeping marketers in control of campaign execution.
 
----
 
 ## Product Vision
 
@@ -68,7 +64,6 @@ Workflow:
 
 This balances automation, transparency, and user trust.
 
----
 
 ## Core Features
 
@@ -110,7 +105,6 @@ This balances automation, transparency, and user trust.
 * Opened, clicked, converted metrics
 * AI-generated campaign insights
 
----
 
 ## Screenshots
 
@@ -127,8 +121,6 @@ This balances automation, transparency, and user trust.
 ![Campaigns](assets/campaigns.png)
 ![Campaigns](assets/campaign.png)
 
----
-
 
 ### Communication Flow
 
@@ -136,7 +128,6 @@ Marketer → Campaign → Communications → Channel Simulator → Callback API 
 
 The channel simulator is implemented as a separate service and asynchronously sends delivery and engagement events back to the CRM through callback APIs.
 
----
 
 ## Key Design Decisions
 
@@ -171,7 +162,6 @@ AI outputs are stored separately.
 
 **Reason:** Explainability and future analysis.
 
----
 
 ## Scalability Considerations
 
@@ -188,7 +178,6 @@ For production-scale systems, I would introduce:
 * Distributed workers
 * Rate limiting
 
----
 
 ## What I Chose Not To Build
 
@@ -203,7 +192,6 @@ To remain focused on campaign intelligence, I intentionally excluded:
 * Complex role management
 * Production-grade queue infrastructure
 
----
 
 ## AI-Native Development Workflow
 
@@ -220,7 +208,6 @@ AI assisted with:
 
 All final design decisions, tradeoffs, feature choices, and implementation details were reviewed and validated by me.
 
----
 
 ## Tech Stack
 
@@ -248,7 +235,6 @@ All final design decisions, tradeoffs, feature choices, and implementation detai
 * Vercel
 * Render
 
----
 
 ## Local Setup
 
@@ -277,7 +263,6 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
----
 
 ## Environment Variables
 
@@ -301,7 +286,6 @@ NEXT_PUBLIC_API_BASE_URL=your_backend_api_url
 CRM_CALLBACK_URL=your_crm_callback_url
 ```
 
----
 
 ## Future Improvements
 
@@ -313,7 +297,6 @@ CRM_CALLBACK_URL=your_crm_callback_url
 * Advanced analytics
 * Autonomous campaign optimization
 
----
 
 ## Author
 
