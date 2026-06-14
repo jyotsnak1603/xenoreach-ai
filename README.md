@@ -105,13 +105,39 @@ This balances automation, transparency, and user trust.
 * Opened, clicked, converted metrics
 * AI-generated campaign insights
 
-
 ## Architecture Diagram
 
-## System Architecture
-
 ```mermaid
-PASTE ABOVE DIAGRAM HERE
+flowchart TD
+    A[Marketer / User] --> B[Next.js Frontend]
+
+    B --> C[Django REST CRM Backend]
+
+    C --> D[(PostgreSQL Database)]
+
+    C --> E[AI Engine / Gemini API]
+    E --> C
+
+    C --> F[Campaign Launch API]
+
+    F --> G[Resolve Segment Audience]
+    G --> H[Create Communication Records]
+
+    H --> I[Channel Simulator Service]
+
+    I --> J[Simulated Events<br/>sent / delivered / opened / clicked / converted / failed]
+
+    J --> K[CRM Receipt Callback API]
+
+    K --> L[CommunicationEvent Table<br/>Full Event History]
+
+    K --> M[Communication Table<br/>Latest Status]
+
+    L --> N[Analytics Dashboard]
+    M --> N
+
+    N --> O[AI Post-Campaign Insights]
+```
 
 ## Screenshots
 
