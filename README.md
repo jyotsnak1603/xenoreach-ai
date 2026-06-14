@@ -106,6 +106,13 @@ This balances automation, transparency, and user trust.
 * AI-generated campaign insights
 
 
+## Architecture Diagram
+
+## System Architecture
+
+```mermaid
+PASTE ABOVE DIAGRAM HERE
+
 ## Screenshots
 
 ### Dashboard
