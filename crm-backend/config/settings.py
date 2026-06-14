@@ -146,13 +146,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "").split(",")
-    if origin.strip()
-]
+CORS_ENV = os.environ.get("CORS_ALLOWED_ORIGINS", "")
 
-CORS_ALLOW_ALL_ORIGINS = os.environ.get("CORS_ALLOWED_ORIGINS") == "*"
+if CORS_ENV == "*":
+    CORS_ALLOW_ALL_ORIGINS = True
+    CORS_ALLOWED_ORIGINS = []
+else:
+    CORS_ALLOW_ALL_ORIGINS = False
+    CORS_ALLOWED_ORIGINS = [
+        origin.strip()
+        for origin in CORS_ENV.split(",")
+        if origin.strip()
+    ]
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 CHANNEL_SERVICE_URL = os.getenv("CHANNEL_SERVICE_URL", "")
