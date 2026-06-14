@@ -22,7 +22,7 @@ class CommunicationEventListView(generics.ListAPIView):
 
 
 VALID_TRANSITIONS = {
-    "created": ["sent"],
+    "created": ["sent", "delivered", "failed", "opened", "read", "clicked", "converted"],
     "sent": ["delivered", "failed"],
     "delivered": ["opened", "read", "clicked", "converted"],
     "opened": ["clicked", "converted"],
