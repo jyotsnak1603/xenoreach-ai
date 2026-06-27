@@ -59,7 +59,7 @@ class Command(BaseCommand):
         cities = ["Delhi", "Mumbai", "Bangalore", "Pune", "Jaipur", "Hyderabad"]
         channels = ["whatsapp", "sms", "email"]
         
-        for i in range(50):
+        for i in range(15):
             customer = Customer.objects.create(
                 name=f"{random.choice(names)} {i+1}",
                 email=f"customer{i+1}@example.com",
@@ -147,7 +147,7 @@ class Command(BaseCommand):
         sources = ["website", "referral", "whatsapp", "cold_call"]
         statuses = ["new", "contacted", "interested", "converted", "lost"]
         
-        for i in range(25):
+        for i in range(10):
             status = random.choice(statuses)
             created_at = timezone.now() - timedelta(days=random.randint(1, 30))
             last_contacted = created_at + timedelta(days=random.randint(1, 5)) if status != "new" else None
