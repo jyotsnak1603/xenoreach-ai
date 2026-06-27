@@ -1,7 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 from apps.segments.models import Segment
 
-# Create your models here.
 
 class Campaign(models.Model):
     STATUS_CHOICES = [
@@ -19,8 +19,20 @@ class Campaign(models.Model):
         ("rcs", "RCS"),
     ]
 
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="campaigns",
+        null=True,
+        blank=True,
+    )
+
     name = models.CharField(max_length=150)
+    product_name = models.CharField(max_length=120, blank=True)
+    industry = models.CharField(max_length=100, blank=True)
+    budget = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     goal = models.TextField()
+
     segment = models.ForeignKey(
         Segment,
         on_delete=models.PROTECT,
@@ -47,6 +59,7 @@ class Campaign(models.Model):
         indexes = [
             models.Index(fields=["status"]),
             models.Index(fields=["segment"]),
+            models.Index(fields=["owner"]),
         ]
 
     def __str__(self):

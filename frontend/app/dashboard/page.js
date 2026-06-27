@@ -7,47 +7,42 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState({
-    customers: 0,
-    segments: 0,
-    campaigns: 0,
-    communications: 0,
+    total_campaigns: 0,
+    active_campaigns: 0,
+    generated_content: 0,
+    audience_segments: 0,
+    total_leads: 0,
+    converted_leads: 0,
+    conversion_rate: 0,
+    followup_needed: 0,
   });
+  
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadStats() {
+    async function loadDashboard() {
       try {
-        const [customers, segments, campaigns, communications] =
-          await Promise.all([
-            api.get("/customers/"),
-            api.get("/segments/"),
-            api.get("/campaigns/"),
-            api.get("/communications/"),
-          ]);
-
-        setStats({
-          customers: customers.data.length,
-          segments: segments.data.length,
-          campaigns: campaigns.data.length,
-          communications: communications.data.length,
-        });
+        const [dashRes, notifRes] = await Promise.all([
+          api.get("/reports/dashboard/"),
+          api.get("/reports/notifications/"),
+        ]);
+        setStats(dashRes.data);
+        setNotifications(notifRes.data);
       } catch (error) {
-        console.error(error);
+        console.error("Dashboard load error", error);
+      } finally {
+        setLoading(false);
       }
     }
-    loadStats();
+    loadDashboard();
   }, []);
 
   const cards = [
-    { label: "Total Customers", value: stats.customers, icon: Users, trend: "+12.5%", isPositive: true, href: "/customers" },
-    { label: "Active Segments", value: stats.segments, icon: Target, trend: "+4.2%", isPositive: true, href: "/segments" },
-    { label: "Campaigns Created", value: stats.campaigns, icon: Megaphone, trend: "+18.1%", isPositive: true, href: "/campaigns" },
-    { label: "Messages Sent", value: stats.communications, icon: Send, trend: "+24.0%", isPositive: true, href: "/analytics" },
-  ];
-
-  const activities = [
-    { id: 1, title: "Campaign Launched", desc: "Diwali VIP Reactivation is now active.", time: "10m ago", icon: Play, color: "text-primary", bg: "bg-primary/10" },
-    { id: 2, title: "AI Generation", desc: "Generated 'Inactive Customers' segment.", time: "1h ago", icon: Sparkles, color: "text-accent", bg: "bg-accent/10" },
-    { id: 3, title: "Campaign Completed", desc: "Summer Sale reached 100% audience.", time: "3h ago", icon: CheckCircle2, color: "text-success", bg: "bg-success/10" },
+    { label: "Total Leads", value: stats.total_leads, icon: Users, trend: "+12.5%", isPositive: true, href: "/leads" },
+    { label: "Active Campaigns", value: stats.active_campaigns, icon: Megaphone, trend: "+1", isPositive: true, href: "/campaigns" },
+    { label: "AI Content Generated", value: stats.generated_content, icon: Sparkles, trend: "+4", isPositive: true, href: "/campaigns" },
+    { label: "Lead Conversion", value: `${stats.conversion_rate}%`, icon: Target, trend: "+2.1%", isPositive: true, href: "/analytics" },
   ];
 
   return (
@@ -56,7 +51,7 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row gap-6 justify-between items-start md:items-end">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold tracking-tight text-balance">
-            Welcome back, Marketer
+            Welcome to XenoReach AI
           </h1>
           <p className="text-muted-foreground text-lg">
             Launch smarter campaigns powered by AI.
@@ -135,19 +130,23 @@ export default function DashboardPage() {
           </h3>
           
           <div className="flex-1 space-y-6">
-            {activities.map((act, i) => (
-              <div key={act.id} className="flex gap-4 relative">
-                {i !== activities.length - 1 && <div className="absolute left-4 top-10 bottom-0 w-px bg-border -translate-x-1/2" />}
-                <div className={`w-8 h-8 rounded-full ${act.bg} ${act.color} flex items-center justify-center shrink-0 border border-border/50 shadow-sm z-10`}>
-                  <act.icon className="w-4 h-4" />
+            {notifications.length === 0 ? (
+              <p className="text-sm text-muted-foreground mt-4">No recent activity.</p>
+            ) : (
+              notifications.map((act, i) => (
+                <div key={i} className="flex gap-4 relative">
+                  {i !== notifications.length - 1 && <div className="absolute left-4 top-10 bottom-0 w-px bg-border -translate-x-1/2" />}
+                  <div className={`w-8 h-8 rounded-full ${act.type === 'warning' ? 'bg-warning/10 text-warning' : act.type === 'success' ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'} flex items-center justify-center shrink-0 border border-border/50 shadow-sm z-10`}>
+                    {act.type === 'warning' ? <Clock className="w-4 h-4" /> : act.type === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  </div>
+                  <div>
+                    <Link href={act.link} className="text-sm font-semibold hover:text-primary transition-colors">{act.title}</Link>
+                    <p className="text-xs text-muted-foreground mt-0.5">{act.description}</p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-1 uppercase tracking-wider">Just now</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold">{act.title}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{act.desc}</p>
-                  <p className="text-[10px] text-muted-foreground/60 mt-1 uppercase tracking-wider">{act.time}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

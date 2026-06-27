@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 import os
 
 import dj_database_url
@@ -65,14 +66,19 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
 
+    'apps.accounts',
     'apps.customers',
     'apps.segments',
     'apps.campaigns',
     'apps.communications',
     'apps.analytics',
     'apps.ai_engine',
+    'apps.leads',
+    'apps.reports',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +167,22 @@ else:
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 CHANNEL_SERVICE_URL = os.getenv("CHANNEL_SERVICE_URL", "")
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}
+
+# JWT Settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}

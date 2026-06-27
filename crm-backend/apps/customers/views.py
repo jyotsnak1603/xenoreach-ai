@@ -1,5 +1,6 @@
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
@@ -10,16 +11,19 @@ from .serializers import CustomerSerializer, OrderSerializer
 
 
 class CustomerListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Customer.objects.all().order_by("-created_at")
     serializer_class = CustomerSerializer
 
 
 class CustomerDetailView(generics.RetrieveDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def customer_timeline(request, pk):
     try:
         customer = Customer.objects.get(pk=pk)
@@ -69,11 +73,13 @@ def customer_timeline(request, pk):
 
 
 class OrderListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Order.objects.select_related("customer").all().order_by("-order_date")
     serializer_class = OrderSerializer
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def seed_customers(request):
     Customer.objects.all().delete()
 
@@ -103,6 +109,7 @@ def seed_customers(request):
 
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def seed_orders(request):
     Order.objects.all().delete()
 

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import "./globals.css";
+import { getUserData, logout, isAuthenticated } from "../lib/auth";
 import {
   LayoutDashboard,
   Users,
@@ -16,15 +17,20 @@ import {
   CircleUser,
   Sun,
   Moon,
+  Contact,
+  BrainCircuit,
+  Settings,
 } from "lucide-react";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Leads", href: "/leads", icon: Contact },
   { name: "Customers", href: "/customers", icon: Users },
   { name: "Segments", href: "/segments", icon: Target },
   { name: "Campaigns", href: "/campaigns", icon: Megaphone },
   { name: "AI Planner", href: "/ai-planner", icon: Sparkles },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Reporting", href: "/reporting", icon: BarChart3 },
+  { name: "AI Insights", href: "/ai-insights", icon: BrainCircuit },
 ];
 
 function SidebarNav() {
@@ -56,9 +62,12 @@ function SidebarNav() {
 }
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+  const router = useRouter();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [isDark, setIsDark] = useState(true);
+  const [user, setUser] = useState(null);
   const notifRef = useRef(null);
   const profRef = useRef(null);
   const [mounted, setMounted] = useState(false);
@@ -89,6 +98,27 @@ export default function RootLayout({ children }) {
     localStorage.setItem("xeno-theme", next ? "dark" : "light");
   };
 
+  useEffect(() => {
+    if (mounted) {
+      setUser(getUserData());
+      const publicRoutes = ['/', '/login', '/signup', '/forgot-password'];
+      if (!publicRoutes.includes(pathname) && !isAuthenticated()) {
+        router.push('/login');
+      }
+    }
+  }, [mounted, pathname, router]);
+
+  const publicRoutes = ['/', '/login', '/signup', '/forgot-password'];
+  if (publicRoutes.includes(pathname)) {
+    return (
+      <html lang="en" className={isDark ? "dark" : "light"} suppressHydrationWarning>
+        <body className="bg-background text-foreground min-h-screen flex flex-col">
+          {children}
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en" className={isDark ? "dark" : "light"} suppressHydrationWarning>
       <body className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -113,11 +143,11 @@ export default function RootLayout({ children }) {
           <div className="p-4 border-t border-border mt-auto">
             <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-border">
               <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-accent flex items-center justify-center">
-                <span className="text-xs font-bold text-white">MR</span>
+                <span className="text-xs font-bold text-white">{user?.profile?.avatar_initials || "U"}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Marketer</p>
-                <p className="text-xs text-muted-foreground truncate">Free Plan</p>
+                <p className="text-sm font-medium truncate">{user?.first_name || "User"}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.profile?.role_display || "Free Plan"}</p>
               </div>
             </div>
           </div>
@@ -183,10 +213,10 @@ export default function RootLayout({ children }) {
                 </button>
                 {showProfile && (
                   <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-xl shadow-2xl py-2 animate-in fade-in slide-in-from-top-2 z-50">
-                    <div className="px-4 py-2 font-bold text-sm border-b border-border mb-2">My Account</div>
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-white/5">Settings</button>
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-white/5">Billing</button>
-                    <button className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 mt-2 border-t border-border pt-3">Log out</button>
+                    <div className="px-4 py-2 font-bold text-sm border-b border-border mb-2">{user?.full_name || "My Account"}</div>
+                    <button onClick={() => router.push('/profile')} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 flex items-center gap-2"><CircleUser className="w-4 h-4"/> Profile</button>
+                    <button onClick={() => router.push('/settings')} className="w-full text-left px-4 py-2 text-sm hover:bg-white/5 flex items-center gap-2"><Settings className="w-4 h-4"/> Settings</button>
+                    <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-danger hover:bg-danger/10 mt-2 border-t border-border pt-3">Log out</button>
                   </div>
                 )}
               </div>

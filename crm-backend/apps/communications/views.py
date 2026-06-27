@@ -1,5 +1,6 @@
 from rest_framework import generics, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.utils import timezone
 from django.db import IntegrityError
@@ -9,16 +10,21 @@ from .serializers import CommunicationSerializer, CommunicationEventSerializer
 
 
 class CommunicationListView(generics.ListAPIView):
-    queryset = Communication.objects.select_related(
-        "campaign",
-        "customer"
-    ).all()
+    permission_classes = [IsAuthenticated]
     serializer_class = CommunicationSerializer
+
+    def get_queryset(self):
+        return Communication.objects.select_related(
+            "campaign", "customer"
+        ).filter(campaign__owner=self.request.user)
 
 
 class CommunicationEventListView(generics.ListAPIView):
-    queryset = CommunicationEvent.objects.all()
+    permission_classes = [IsAuthenticated]
     serializer_class = CommunicationEventSerializer
+
+    def get_queryset(self):
+        return CommunicationEvent.objects.filter(communication__campaign__owner=self.request.user)
 
 
 VALID_TRANSITIONS = {
@@ -34,6 +40,7 @@ VALID_TRANSITIONS = {
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])  # Called by channel-service, not a user
 def channel_callback(request):
     communication_id = request.data.get("communication_id")
     event_type = request.data.get("event_type")

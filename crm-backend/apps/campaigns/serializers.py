@@ -9,6 +9,7 @@ class CampaignSerializer(serializers.ModelSerializer):
         model = Campaign
         fields = "__all__"
         read_only_fields = [
+            "owner",
             "status",
             "target_audience_count",
             "launched_at",
