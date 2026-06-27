@@ -19,11 +19,14 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **kwargs):
         self.stdout.write("Wiping old data...")
-        User.objects.filter(is_superuser=False).delete()
-        Customer.objects.all().delete()
+        # Must delete child data BEFORE users due to PROTECT foreign keys on owner
+        from apps.communications.models import Communication
+        Communication.objects.all().delete()
+        Lead.objects.all().delete()
         Campaign.objects.all().delete()
         Segment.objects.all().delete()
-        Lead.objects.all().delete()
+        Customer.objects.all().delete()
+        User.objects.filter(is_superuser=False).delete()
 
         # 1. Create Users
         self.stdout.write("Creating demo users...")
