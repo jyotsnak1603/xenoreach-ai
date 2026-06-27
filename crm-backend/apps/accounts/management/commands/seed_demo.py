@@ -123,12 +123,14 @@ class Command(BaseCommand):
                 final_status = "opened"
             else:
                 final_status = "delivered"
-                
+
+            msg = f"Hi {customer.name}, we have a special Diwali offer for you!"
             Communication.objects.create(
                 campaign=cam1,
                 customer=customer,
                 channel=cam1.channel,
-                message_body=f"Hi {customer.name}, we have a special Diwali offer for you!",
+                recipient=customer.phone or customer.email,
+                personalized_message=msg,
                 current_status=final_status,
                 sent_at=timezone.now() - timedelta(days=2),
                 delivered_at=timezone.now() - timedelta(days=2, hours=-1) if final_status in ["delivered", "opened", "clicked", "converted"] else None,
