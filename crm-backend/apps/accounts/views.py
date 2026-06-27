@@ -100,11 +100,12 @@ def change_password(request):
     user.save()
     return Response({"message": "Password changed successfully."})
 
-@api_view(["GET"])
+@api_view(['GET'])
 @permission_classes([AllowAny])
 def trigger_seed(request):
+    import traceback
     try:
         call_command('seed_demo')
         return Response({"message": "Successfully seeded demo data!"})
     except Exception as e:
-        return Response({"error": str(e)}, status=500)
+        return Response({"error": str(e), "traceback": traceback.format_exc()}, status=500)
