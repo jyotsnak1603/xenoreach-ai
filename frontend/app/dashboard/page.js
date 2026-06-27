@@ -96,7 +96,12 @@ export default function DashboardPage() {
             <div className="relative">
               <p className="text-sm font-medium text-muted-foreground mb-1">{card.label}</p>
               <h2 className="text-3xl font-bold tracking-tight text-foreground">
-                {card.value === 0 ? <div className="skeleton w-16 h-8 mt-1" /> : card.value.toLocaleString()}
+                {loading
+                  ? <div className="skeleton w-16 h-8 mt-1" />
+                  : typeof card.value === 'number'
+                    ? card.value.toLocaleString()
+                    : card.value
+                }
               </h2>
             </div>
           </Link>
