@@ -10,6 +10,7 @@ from apps.customers.models import Customer, Order
 from apps.segments.models import Segment
 from apps.campaigns.models import Campaign
 from apps.leads.models import Lead, LeadActivity
+from apps.communications.models import Communication
 
 
 class Command(BaseCommand):
@@ -105,6 +106,35 @@ class Command(BaseCommand):
             target_audience_count=12,
             ai_reasoning="WhatsApp is highly effective for festival greetings with high open rates."
         )
+
+        # 4.5 Create Communications for Analytics
+        self.stdout.write("Seeding campaign communications...")
+        campaign_customers = Customer.objects.order_by("?")[:cam1.target_audience_count]
+        statuses = ["sent", "delivered", "opened", "clicked", "converted"]
+        weights = [1, 2, 4, 3, 2] # More likely to be opened/delivered
+        
+        for idx, customer in enumerate(campaign_customers):
+            # Guarantee at least some converted and clicked for realistic data
+            if idx == 0:
+                final_status = "converted"
+            elif idx == 1 or idx == 2:
+                final_status = "clicked"
+            elif idx < 8:
+                final_status = "opened"
+            else:
+                final_status = "delivered"
+                
+            Communication.objects.create(
+                campaign=cam1,
+                customer=customer,
+                channel=cam1.channel,
+                message_body=f"Hi {customer.name}, we have a special Diwali offer for you!",
+                current_status=final_status,
+                sent_at=timezone.now() - timedelta(days=2),
+                delivered_at=timezone.now() - timedelta(days=2, hours=-1) if final_status in ["delivered", "opened", "clicked", "converted"] else None,
+                opened_at=timezone.now() - timedelta(days=1) if final_status in ["opened", "clicked", "converted"] else None,
+                clicked_at=timezone.now() - timedelta(hours=12) if final_status in ["clicked", "converted"] else None,
+            )
 
         # 5. Create Leads
         self.stdout.write("Creating leads...")
