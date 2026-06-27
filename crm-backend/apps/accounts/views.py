@@ -104,8 +104,18 @@ def change_password(request):
 @permission_classes([AllowAny])
 def trigger_seed(request):
     import traceback
+    import threading
+    from django.core.management import call_command
+    
+    def run_seed():
+        try:
+            call_command('seed_demo')
+        except Exception as e:
+            print(f"Background seed error: {e}")
+            
     try:
-        call_command('seed_demo')
-        return Response({"message": "Successfully seeded demo data!"})
+        thread = threading.Thread(target=run_seed)
+        thread.start()
+        return Response({"message": "Demo data seeding has started in the background! Please wait 1-2 minutes for it to complete."})
     except Exception as e:
         return Response({"error": str(e), "traceback": traceback.format_exc()}, status=500)
