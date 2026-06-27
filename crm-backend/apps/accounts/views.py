@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.management import call_command
 
 from .models import UserProfile
 from .serializers import RegisterSerializer, UserSerializer, ProfileUpdateSerializer
@@ -98,3 +99,12 @@ def change_password(request):
     user.set_password(new_pass)
     user.save()
     return Response({"message": "Password changed successfully."})
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def trigger_seed(request):
+    try:
+        call_command('seed_demo')
+        return Response({"message": "Successfully seeded demo data!"})
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

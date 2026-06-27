@@ -10,4 +10,6 @@ urlpatterns = [
     path("auth/profile/", views.update_profile, name="auth-profile-update"),
     path("auth/change-password/", views.change_password, name="auth-change-password"),
     path("auth/token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    
+    path("dev/seed-demo/", views.trigger_seed, name="dev-seed"),
 ]
