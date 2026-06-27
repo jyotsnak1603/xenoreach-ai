@@ -10,7 +10,7 @@ It helps D2C and retail brands identify the right audience, generate campaign me
 ## Live Demo
 
 **Frontend:**
-https://xenoreach-ai.vercel.app
+https://xenoreach-ai-one.vercel.app/
 
 **Backend API:**
 https://xenoreach-backend-l9eh.onrender.com
